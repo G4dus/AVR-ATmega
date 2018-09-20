@@ -18,6 +18,14 @@ int gndPin = 8;     //option to easier connection board remove if
 MAX6675 thermocouple(thermoCLK, thermoCS, thermoSO);
 
 
+//motor setup
+
+int analogInput = A0;
+int Motor_Speed = 0;
+int Motor_PWM = 4;
+
+
+//interval
 unsigned long previousMillis = 0; 
 const long interval = 40;                                                   //Set interval time [ms]
   
@@ -28,11 +36,13 @@ void setup()
   pinMode(0, INPUT_PULLUP); //#Setpoint down
   pinMode(vccPin, OUTPUT); digitalWrite(vccPin, HIGH);
   pinMode(gndPin, OUTPUT); digitalWrite(gndPin, LOW);
-
+  
+  pinMode(Motor_PWM, OUTPUT); //Motor speed PWM
   
   pinMode(thermoCS, OUTPUT);
   pinMode(thermoSO, INPUT);
   pinMode(thermoCLK, OUTPUT);
+
 
  double Setpoint = 150; //defile setpoint 2 of 2
   Input_1 = thermocouple.readCelsius(); 
@@ -63,15 +73,15 @@ void loop()
   PID_1.Compute();                        //Call and calculate PID 
   analogWrite(3,Output_1);                  //output PID controler
 
-  if (currentMillis - previousMillis >= interval) //cyclic interrupts                                         ??????????????????????????????????????????????????????
+  if (currentMillis - previousMillis >= interval) //cyclic interrupts
      {
       previousMillis = currentMillis;
-      Input_1 = thermocouple.readCelsius(); //You have to call readCelsius in intervals diffrent crash MAX6675 ???????????????????????????????????????????????????
+      Input_1 = thermocouple.readCelsius(); //You have to call readCelsius in intervals otherwise crash MAX6675
      }
  
  //logs
   Serial.println(Input_1);
-  Serial.println (Setpoint);                      
+  Serial.println (Setpoint);
 
 
 /*
@@ -80,7 +90,8 @@ void loop()
 *
 */
 
-
+ int Motor_Speed = analogRead(analogInput);
+ analogWrite(Motor_PWM, Motor_Speed /4);
 
 }
 
@@ -91,7 +102,7 @@ void loop()
 *******************
 *
 * Analog: 
-*       A0 []
+*       A0 [x]
 *       A1 []
 *       A2 []
 *       A3 []
@@ -103,7 +114,7 @@ void loop()
 *       1  [x]  Setpoint up
 *       2  []
 *       3  [x]  PID PWM output 0-255
-*       4  []
+*       4  [x]  Motor PWM output 0-255
 *       5  []
 *       6  []
 *       7  []
