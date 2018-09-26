@@ -1,5 +1,3 @@
-//
-//Download library bellow
 #include <max6675.h>
 #include <PID_v1.h>
 
@@ -7,7 +5,7 @@
 double Setpoint = 150; //define Setpoint 1 of 2
 double Input_1;
 double Output_1;                          
-double Kp_1=0.01, Ki_1=0, Kd_1=0;                                         //Set Kp, Ki, Kd            
+double Kp_1=0.1, Ki_1=10000, Kd_1=2500;                                         //Set Kp, Ki, Kd            
 PID PID_1(&Input_1, &Output_1, &Setpoint, Kp_1, Ki_1, Kd_1, DIRECT); 
 
 
@@ -29,7 +27,8 @@ int Motor_PWM = 4;
 
 //interval
 unsigned long previousMillis = 0; 
-const long interval = 40;                                                   //Set interval time [ms]
+const long interval = 40;   
+const long interval_2 = 250;                                                   //Set interval time [ms]
   
 void setup()
 {
@@ -57,20 +56,21 @@ void setup()
 
 void loop()
      {
-
+delay(250);
       unsigned long currentMillis = millis();
       
-    if (digitalRead(1) == LOW)
+    if (1==0)//(digitalRead(1) == LOW)
        {
        Setpoint = Setpoint + 1;
        delay(250);
        } 
        
-    if (digitalRead(0) == LOW)
+    if (1==0)  // (digitalRead(0) == LOW)
        {
        Setpoint = Setpoint -1;
        delay(250);
        }     
+
 
   PID_1.Compute();                        //Call and calculate PID 
   analogWrite(3,Output_1);                  //output PID controler
@@ -80,10 +80,15 @@ void loop()
       previousMillis = currentMillis;
       Input_1 = thermocouple.readCelsius(); //You have to call readCelsius in intervals otherwise crash MAX6675
      }
+
+  Serial.print(Input_1);
+  Serial.print("    ");
+  Serial.println(Setpoint);
+    
  
  //logs
-  Serial.println(Input_1);
-  Serial.println (Setpoint);
+
+
 
 
 /*
