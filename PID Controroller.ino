@@ -7,7 +7,7 @@
 double Setpoint = 150; //define Setpoint 1 of 2
 double Input_1;
 double Output_1;                          
-double Kp_1=2, Ki_1=1, Kd_1=0.2;                                         //Set Kp, Ki, Kd            
+double Kp_1=0.01, Ki_1=0, Kd_1=0;                                         //Set Kp, Ki, Kd            
 PID PID_1(&Input_1, &Output_1, &Setpoint, Kp_1, Ki_1, Kd_1, DIRECT); 
 
 
