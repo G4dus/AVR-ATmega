@@ -1,13 +1,16 @@
+#include <FastPID.h>
 #include <max6675.h>
-#include <PID_v1.h>
 
-//PID_1
-double Setpoint = 150; //define Setpoint 1 of 2
+
+#define PIN_OUTPUT    3
+
+float Kp=20, Ki=1, Kd=2, Hz=600;
+
+int output_bits = 8;
+bool output_signed = false;
+FastPID myPID(Kp, Ki, Kd, Hz, output_bits, output_signed);
+
 double Input_1;
-double Output_1;                          
-double Kp_1=0.1, Ki_1=10000, Kd_1=2500;                                         //Set Kp, Ki, Kd            
-PID PID_1(&Input_1, &Output_1, &Setpoint, Kp_1, Ki_1, Kd_1, DIRECT); 
-
 
 //thermocople max6675 config
 int thermoSO = 12;
@@ -27,12 +30,14 @@ int Motor_PWM = 4;
 
 //interval
 unsigned long previousMillis = 0; 
-const long interval = 40;   
+const long interval = 280;   
+
+unsigned long previousMillis_2 = 0; 
 const long interval_2 = 250;                                                   //Set interval time [ms]
   
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   pinMode(1, INPUT_PULLUP); //#Setpoint up
   pinMode(0, INPUT_PULLUP); //#Setpoint down
   pinMode(vccPin, OUTPUT); digitalWrite(vccPin, HIGH);
@@ -45,10 +50,9 @@ void setup()
   pinMode(thermoCLK, OUTPUT);
 
 
- double Setpoint = 150; //defile setpoint 2 of 2
+
   Input_1 = thermocouple.readCelsius(); 
-  PID_1.SetMode(AUTOMATIC);
-  PID_1.SetTunings(Kp_1, Ki_1, Kd_1);
+
 
  delay(500); //load Max6675 config please wait...
 
@@ -56,7 +60,8 @@ void setup()
 
 void loop()
      {
-delay(250);
+      int Setpoint =150;
+//delay(240);
       unsigned long currentMillis = millis();
       
     if (1==0)//(digitalRead(1) == LOW)
@@ -72,8 +77,18 @@ delay(250);
        }     
 
 
-  PID_1.Compute();                        //Call and calculate PID 
-  analogWrite(3,Output_1);                  //output PID controler
+  int setpoint = 150;
+  int feedback = Input_1;
+  uint32_t before, after;
+  before = micros();
+  uint8_t output = myPID.step(setpoint, feedback);
+  after = micros();
+analogWrite(PIN_OUTPUT, output);
+
+
+
+
+
 
   if (currentMillis - previousMillis >= interval) //cyclic interrupts
      {
@@ -81,10 +96,27 @@ delay(250);
       Input_1 = thermocouple.readCelsius(); //You have to call readCelsius in intervals otherwise crash MAX6675
      }
 
-  Serial.print(Input_1);
-  Serial.print("    ");
-  Serial.println(Setpoint);
-    
+
+
+      if (currentMillis - previousMillis_2 >= interval_2) //cyclic interrupts
+     {
+      previousMillis_2 = currentMillis;
+     
+//  Serial.print(Input_1);
+//  Serial.print("    ");
+//  Serial.println(Setpoint);
+
+
+  Serial.print("runtime: "); 
+  Serial.print(after - before);
+  Serial.print(" sp: "); 
+  Serial.print(setpoint); 
+  Serial.print(" fb: "); 
+  Serial.print(feedback);
+  Serial.print(" out: ");
+  Serial.println(output);
+  delay(100);
+     }
  
  //logs
 
