@@ -4,7 +4,7 @@
 #include <PID_v1.h>
 
 //PID_1
-double Setpoint = 216;                                      //define Setpoint 1 of 2 216..
+double Setpoint = 195;                                      //define Setpoint 1 of 2 216..
 double Input_1;
 double Output_1;                          
 double Kp_1=2.8, Ki_1=0.01, Kd_1=150;                                         //Set Kp, Ki, Kd            
@@ -25,23 +25,26 @@ int analogInput = A0;
 int Motor_Speed =0;
 int Motor_PWM = 5;
 
+
 //puller motor
 int StepPin = 6;
 int analogInputStepSpeed = A1;
-int StepSpeed = 5;
+int StepSpeed = 300;
 
 
 //interval
 unsigned long previousMillis = 0; 
 const long interval_1 = 250;  
 unsigned long previousMillis2 = 0; 
-const long interval_2 = 5;    
+const long interval_2 = 9;    
 
 
   
 void setup()
 {
   Serial.begin(115200);
+
+TCCR0B = TCCR0B & B11111000 | B00000101; // for PWM frequency of 61.04 Hz
 
   pinMode(Motor_PWM, OUTPUT); //Motor speed PWM
 
@@ -89,6 +92,7 @@ void loop()
          {
            previousMillis2 = currentMillis;
           digitalWrite(StepPin, HIGH);
+            Serial.println("High");
          }
          
          digitalWrite(StepPin, LOW);
@@ -96,7 +100,8 @@ void loop()
 
 
   
-//  Serial.print(" ");
+  Serial.print(Motor_Speed);
+  Serial.print(" ");
   Serial.println(Input_1);
 
 
