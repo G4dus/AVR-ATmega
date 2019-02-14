@@ -4,7 +4,7 @@
 #include <PID_v1.h>
 
 //PID_1
-double Setpoint = 195;                                      //define Setpoint 1 of 2 216..
+double Setpoint = 220;              //define Setpoint 1 of 2 216..
 double Input_1;
 double Output_1;                          
 double Kp_1=2.8, Ki_1=0.01, Kd_1=150;                                         //Set Kp, Ki, Kd            
@@ -100,8 +100,6 @@ void loop()
 
 
   
-  Serial.print(Motor_Speed);
-  Serial.print(" ");
   Serial.println(Input_1);
 
 
